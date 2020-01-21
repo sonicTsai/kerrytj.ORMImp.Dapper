@@ -172,14 +172,14 @@ where EmployeeID = @EmployeeID";
             }
         }
 
-        public  async Task<IEnumerable<Product>> GetAllProductWithCategory() {
+        public  async Task<IEnumerable<Products>> GetAllProductWithCategory() {
             //多表對應
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
                 var selectAllProductWithCategorySQL = @"select * from Products p 
     inner join Categories c on c.CategoryID = p.CategoryId
     Order by p.ProductID";
-                var allProductWithCategory = await conn.QueryAsync<Product, Category, Product>
+                var allProductWithCategory = await conn.QueryAsync<Products, Category, Products>
                     (selectAllProductWithCategorySQL, (prod, cg) => { prod.Category = cg; return prod; }, splitOn: "CategoryId");
                 return allProductWithCategory;
             }

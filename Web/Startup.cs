@@ -34,11 +34,11 @@ namespace Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDapperDBContext<TestDBContext>(options =>
+            services.AddDapperDBContext<MsSqlDapperDBContext>(options =>
                 { options.Configuration = DBConfig.DefaultSqlConnectionString; }
             );
 
-            services.AddTransient<IProductRepository, UowProductRepository>();
+            services.AddTransient<IProductsRepository, UowProductsRepository>();
             services.AddTransient<IEmployeesRepository, EmployeesRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

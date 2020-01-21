@@ -8,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace Repository.Repositories
 {
-    public class UowProductRepository : IProductRepository
+    public class UowProductsRepository : IProductsRepository
     {
         private readonly DapperDBContext _context;
 
-        public UowProductRepository(DapperDBContext context)
+        public UowProductsRepository(DapperDBContext context)
         {
             this._context = context;
         }
 
-        public async Task<bool> AddAsync(Product prod)
+        public async Task<bool> AddAsync(Products prod)
         {
-            string sql = @"INSERT INTO Product 
+            string sql = @"INSERT INTO Products 
                         (ProductName
                         ,QuantityPerUnit
                         ,UnitPrice
@@ -32,31 +32,17 @@ namespace Repository.Repositories
             return await _context.ExecuteAsync(sql, prod) > 0;
         }
 
-        public Task<bool> DeleteAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Product>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Product> GetByIDAsync(int id)
+        public async Task<Products> GetByIDAsync(int id)
         {
             string sql = @"SELECT ProductID
                             ,ProductName
                             ,QuantityPerUnit
                             ,UnitPrice 
                             ,CategoryID
-                        FROM Product
-                        WHERE ProductID = @Id";
-            return await _context.QueryFirstOrDefaultAsync<Product>(sql, new { Id = id });
+                        FROM Products
+                        WHERE ProductID = @ProductID";
+            return await _context.QueryFirstOrDefaultAsync<Products>(sql, new { ProductID = id });
         }
 
-        public Task<bool> UpdateAsync(Product prod)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

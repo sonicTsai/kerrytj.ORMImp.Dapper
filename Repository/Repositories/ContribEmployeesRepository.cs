@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Repository.Repositories
 {
-    public class ContribProductRepository : IProductRepository
+    public class ContribProductRepository : IProductsRepository
     {
-        public async Task<bool> AddAsync(Product prod)
+        public async Task<bool> AddAsync(Products prod)
         {
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
@@ -19,19 +19,19 @@ namespace Repository.Repositories
             }
         }
 
-        public async Task<IEnumerable<Product>> GetAllAsync()
+        public async Task<IEnumerable<Products>> GetAllAsync()
         {
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
-                return await conn.GetAllAsync<Product>();
+                return await conn.GetAllAsync<Products>();
             }
         }
 
-        public async Task<Product> GetByIDAsync(int id)
+        public async Task<Products> GetByIDAsync(int id)
         {
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
-                return await conn.GetAsync<Product>(id);
+                return await conn.GetAsync<Products>(id);
             }
         }
 
@@ -39,12 +39,12 @@ namespace Repository.Repositories
         {
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
-                var entity = await conn.GetAsync<Product>(id);
+                var entity = await conn.GetAsync<Products>(id);
                 return await conn.DeleteAsync(entity);
             }
         }
 
-        public async Task<bool> UpdateAsync(Product prod)
+        public async Task<bool> UpdateAsync(Products prod)
         {
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {

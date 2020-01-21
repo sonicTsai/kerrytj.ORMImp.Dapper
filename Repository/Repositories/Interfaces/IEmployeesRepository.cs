@@ -14,6 +14,6 @@ namespace Repository.Repositories.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<bool> UpdateAsync(Employees emp);
         Task<int> GetEmployeeSalesByCountry();
-        Task<IEnumerable<Product>> GetAllProductWithCategory();
+        Task<IEnumerable<Products>> GetAllProductWithCategory();
     }
 }

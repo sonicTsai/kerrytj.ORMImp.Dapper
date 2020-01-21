@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Repository.DbContext
 {
-    public class TestDBContext : DapperDBContext
+    public class MsSqlDapperDBContext : DapperDBContext
     {
-        public TestDBContext(IOptions<DapperDBContextOptions> optionsAccessor) : base(optionsAccessor)
+        public MsSqlDapperDBContext(IOptions<DapperDBContextOptions> optionsAccessor) : base(optionsAccessor)
         {
         }
 

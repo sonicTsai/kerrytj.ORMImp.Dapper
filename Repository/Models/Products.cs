@@ -12,8 +12,8 @@ using System;
 
 namespace Repository.Models
 {
-    [Table("Product")]
-    public class Product
+    [Table("Products")]
+    public class Products
     {
         [Key]
         public int ProductID { get; set; }
