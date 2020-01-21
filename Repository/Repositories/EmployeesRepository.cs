@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Repository.Repositories
 {
@@ -121,15 +122,7 @@ where EmployeeID = @EmployeeID";
             }
         }
 
-        public async Task<bool> UpdateAsync(Employees emp)
-        {
-            using (IDbConnection conn = DBConfig.GetSqlConnection())
-            {
-                conn.Open();
-                //使用Transaction
-                using (IDbTransaction tran = conn.BeginTransaction())
-                {
-                    string sql = @"UPDATE [dbo].[Employees]
+        private string updateSql = @"UPDATE [dbo].[Employees]
    SET [LastName] = @LastName,
       [FirstName] = @FirstName,
       [Title] = @Title, 
@@ -148,8 +141,39 @@ where EmployeeID = @EmployeeID";
       [ReportsTo] = @ReportsTo, 
       [PhotoPath] = @PhotoPath
     WHERE EmployeeID = @EmployeeID";
-                    var data = await conn.ExecuteAsync(sql, emp, transaction: tran) > 0;
-                    tran.Commit();
+
+        public async Task<bool> UpdateAsync(Employees emp)
+        {
+            using (IDbConnection conn = DBConfig.GetSqlConnection())
+            {
+                conn.Open();
+                //使用Transaction
+                using (IDbTransaction tran = conn.BeginTransaction())
+                {
+                    try
+                    {
+                        var data = await conn.ExecuteAsync(updateSql, emp, transaction: tran) > 0;
+                        tran.Commit();
+                        return data;
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        throw ex;
+                    }
+                }
+            }
+        }
+
+        public async Task<bool> UpdateUsingTransactionScopeAsync(Employees emp)
+        {
+            //使用Transaction Scope，Default TransactionScopeOption = Required
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required))
+            {
+                using (IDbConnection conn = DBConfig.GetSqlConnection())
+                {
+                    var data = await conn.ExecuteAsync(updateSql, emp) > 0;
+                    scope.Complete();
                     return data;
                 }
             }
@@ -172,7 +196,8 @@ where EmployeeID = @EmployeeID";
             }
         }
 
-        public  async Task<IEnumerable<Products>> GetAllProductWithCategory() {
+        public async Task<IEnumerable<Products>> GetAllProductWithCategory()
+        {
             //多表對應
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
