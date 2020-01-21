@@ -82,7 +82,32 @@ namespace Web.Controllers
                 return BadRequest(ModelState);
             }
 
+            var model = await this.GetEmployees(id, emp);
+            await this._employeesRepository.UpdateAsync(model);
+            return NoContent();
+        }
+
+        // PUT: api/Employees/ts/5
+        [HttpPut("ts/{id}", Name = "Put")]
+        public async Task<IActionResult> PutUsingTransactionScope(int id, [FromBody] Employees emp)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var model = await this.GetEmployees(id, emp);
+            await this._employeesRepository.UpdateUsingTransactionScopeAsync(model);
+            return NoContent();
+        }
+
+        private async ValueTask<Employees> GetEmployees(int id, Employees emp) {
             var model = await this._employeesRepository.GetByIDAsync(id);
+            //在同步的方法中呼叫非同步方法，取得Task<Value>中的Value
+            //https://docs.microsoft.com/zh-tw/dotnet/csharp/programming-guide/concepts/async/async-return-types
+            //Result 屬性是封鎖的屬性。 如果您嘗試在其工作完成之前先存取它，目前使用中的執行緒會封鎖，直到工作完成並且有可用的值為止。 
+            //在大部分情況下，您應該使用 await 來存取值，而不是直接存取屬性。
+            //var model = this._employeesRepository.GetByIDAsync(id).Result;
             model.LastName = emp.LastName;
             model.FirstName = emp.FirstName;
             model.Title = emp.Title;
@@ -100,9 +125,7 @@ namespace Web.Controllers
             model.Notes = emp.Notes;
             model.ReportsTo = emp.ReportsTo;
             model.PhotoPath = emp.PhotoPath;
-
-            await this._employeesRepository.UpdateAsync(model);
-            return NoContent();
+            return model;
         }
 
         // DELETE: api/ApiWithActions/5

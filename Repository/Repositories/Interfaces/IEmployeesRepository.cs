@@ -13,6 +13,7 @@ namespace Repository.Repositories.Interfaces
         Task<Employees> GetByIDAsync(int id);
         Task<bool> DeleteAsync(int id);
         Task<bool> UpdateAsync(Employees emp);
+        Task<bool> UpdateUsingTransactionScopeAsync(Employees emp);
         Task<int> GetEmployeeSalesByCountry();
         Task<IEnumerable<Products>> GetAllProductWithCategory();
     }

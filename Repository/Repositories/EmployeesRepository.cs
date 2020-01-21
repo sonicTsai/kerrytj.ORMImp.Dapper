@@ -146,7 +146,6 @@ where EmployeeID = @EmployeeID";
         {
             using (IDbConnection conn = DBConfig.GetSqlConnection())
             {
-                conn.Open();
                 //使用Transaction
                 using (IDbTransaction tran = conn.BeginTransaction())
                 {
@@ -167,16 +166,24 @@ where EmployeeID = @EmployeeID";
 
         public async Task<bool> UpdateUsingTransactionScopeAsync(Employees emp)
         {
-            //使用Transaction Scope，Default TransactionScopeOption = Required
-            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required))
+            bool data = false;
+            //1.使用Transaction Scope，Default TransactionScopeOption = Required
+            //2.TransactionScope在非同步中使用會出現 A TransactionScope must be disposed on the same thread that it was created 錯誤
+            //需使用 TransactionScopeAsyncFlowOption.Enabled 選項，讓Thread可以進行切換其他Thread
+            using (TransactionScope scope = new TransactionScope(TransactionScopeOption.Required, TransactionScopeAsyncFlowOption.Enabled))
             {
                 using (IDbConnection conn = DBConfig.GetSqlConnection())
                 {
-                    var data = await conn.ExecuteAsync(updateSql, emp) > 0;
-                    scope.Complete();
-                    return data;
+                    //ConfigureAwait(false)
+                    //ASP.NET Core 基本上不用去擔心和 UI 互動是不是會發生 deadlock 的問題，
+                    //ASP.NET Core 已經沒有 AspNetSynchronizationContext 的設計了，
+                    //所以任何的非同步呼叫基本上都可以一直採用 ConfigureAwait(false) 來幫你擠出那麼點效能出來．
+                    //https://dotblogs.com.tw/aspnetshare/2018/06/03/configureawaiter
+                    data = await conn.ExecuteAsync(updateSql, emp).ConfigureAwait(false) > 0;
                 }
+                scope.Complete();
             }
+            return data;
         }
 
         public async Task<int> GetEmployeeSalesByCountry()
